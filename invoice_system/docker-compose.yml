@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+    invoice_backend:
+        container_name: invoice_backend
+        build: "invoice_backend/."
+        volumes:
+          - ./invoice_backend:/usr/src/app
+        ports:
+          - "5000:5000"
+        command: uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload
+        environment:
+          - MONGO_URI=mongodb://host.docker.internal:27017/invoice
+          - MODE=development
+    postgres:
+        container_name: postgres
+        image: postgres:14
+        restart: always
+        environment:
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+          - TZ=Asia/Taipei
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+        volumes:
+          - postgres_data:/var/lib/postgresql/data
+    airflow_webserver:
+        container_name: airflow_webserver
+        build: "airflow/."
+        depends_on:
+          - postgres
+        environment:
+          - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres@postgres:5432/invoice
+          - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+          - AIRFLOW__CORE__LOAD_EXAMPLES=False
+          - AIRFLOW__WEBSERVER__SECRET_KEY=secret
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+          - MONGO_URI=mongodb://host.docker.internal:27017/invoice
+        volumes:
+          - ./airflow/dags:/opt/airflow/dags
+          - ./airflow/logs:/opt/airflow/logs
+          - ./airflow/:/opt/airflow
+        ports:
+          - "8080:8080"
+        command: bash -c "export PYTHONPATH=$PYTHONPATH:/opt/airflow && airflow webserver -p 8080"
+    airflow_scheduler:
+        container_name: airflow_scheduler
+        build: "airflow/."
+        depends_on:
+          - postgres
+        environment:
+          - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres@postgres:5432/invoice
+          - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+          - AIRFLOW__CORE__LOAD_EXAMPLES=False
+          - AIRFLOW__WEBSERVER__SECRET_KEY=secret
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+          - MONGO_URI=mongodb://host.docker.internal:27017/invoice
+        volumes:
+          - ./airflow/dags:/opt/airflow/dags
+          - ./airflow/logs:/opt/airflow/logs
+          - ./airflow/:/opt/airflow
+        command: bash -c "export PYTHONPATH=$PYTHONPATH:/opt/airflow && airflow scheduler"
+volumes:
+  postgres_data:

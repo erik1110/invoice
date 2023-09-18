@@ -1,0 +1,5 @@
+pymongo
+python-dotenv
+pycryptodome==3.18.0
+rich==13.4.2
+tw_invoice==2023.9.6
