@@ -1,3 +1,9 @@
+# Airflow
+*.pid
+*.cfg
+*logs/
+*_config.py
+
 # environment
 *.env
 
