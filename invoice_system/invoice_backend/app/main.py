@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.utils import get_openapi
-from app.routes import docs, test, media
+from app.routes import docs, test, media, invoice
 from app.database import initiate_database
 
 # 自訂 Swagger 文件
@@ -37,6 +37,7 @@ def get_application():
     app.include_router(docs.router)
     app.include_router(test.router, tags=["測試"], prefix="/hello")
     app.include_router(media.router, tags=["圖片"], prefix="/media")
+    app.include_router(invoice.router, tags=["發票"], prefix="/invoice")
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
     return app
