@@ -19,7 +19,7 @@ class SaveData(BaseModel):
                     "user": {
                         "name": "小明",
                         "email": "test@example.com",
-                        "phone": "0928568195",
+                        "phone": "0912345678",
                     },
                     "invoice": [
                         {
@@ -42,7 +42,7 @@ class SaveData(BaseModel):
                     "user": {
                         "name": "小明",
                         "email": "test@example.com",
-                        "phone": "0928568195",
+                        "phone": "0912345678",
                     },
                     "invoice": [
                         {
