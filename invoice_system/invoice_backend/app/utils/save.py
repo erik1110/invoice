@@ -15,6 +15,11 @@ async def perform_save_data(save_data):
         invoice_data = save_data.invoice
         user_data = save_data.user
         for invoice in invoice_data:
+            invoice["gov"] = {
+                "status": "審查中",
+                "gov_status": "等待查詢中",
+                "error_msg": "",
+            }
             data_model = Data(
                 tag=save_data.tag,
                 created_timestamp=datetime.now(tz),
@@ -28,6 +33,11 @@ async def perform_save_data(save_data):
         if 'card_encrypt' in carrier_data:
             encrypted_card = encrypt_with_salt(carrier_data['card_encrypt'])
             carrier_data['card_encrypt'] = encrypted_card
+        carrier_data["gov"] = {
+                "status": "審查中",
+                "gov_status": "等待查詢中",
+                "error_msg": "",
+        }
         data_model = Data(
             tag=save_data.tag,
             created_timestamp=datetime.now(tz),
